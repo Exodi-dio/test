@@ -50,7 +50,7 @@ fun OutputDeviceSheet(onDismiss: () -> Unit) {
             .distinctBy { it.id }
             .sortedBy { it.type }
     }
-    val active = remember { audioManager.activePlaybackConfigurations.firstOrNull()?.audioDevice }
+    val activeId = remember { PlaybackService.preferredDeviceId }
 
     val sheetState = rememberModalBottomSheetState()
     ModalBottomSheet(onDismissRequest = onDismiss, sheetState = sheetState, containerColor = SheetColor) {
@@ -62,7 +62,7 @@ fun OutputDeviceSheet(onDismiss: () -> Unit) {
                 modifier = Modifier.padding(horizontal = 28.dp, vertical = 8.dp),
             )
             devices.forEach { device ->
-                val selected = active != null && device.id == active.id
+                val selected = activeId != null && device.id == activeId
                 Row(
                     Modifier
                         .fillMaxWidth()

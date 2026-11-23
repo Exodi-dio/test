@@ -134,7 +134,8 @@ val BroadcastIcon: ImageVector by lazy {
                         to.second - handle * radius * endTan.second,
                         to.first,
                         to.second,
-                    )                    angle = next
+                    )
+                    angle = next
                 }
             }
         }

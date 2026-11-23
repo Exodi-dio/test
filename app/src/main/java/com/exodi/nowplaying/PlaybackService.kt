@@ -51,11 +51,16 @@ class PlaybackService : MediaSessionService() {
         @Volatile
         private var activePlayer: ExoPlayer? = null
 
+        @Volatile
+        var preferredDeviceId: Int? = null
+            private set
+
         /**
          * Sends the playback to a different output, such as a pair of
          * headphones or a Bluetooth speaker.
          */
         fun setPreferredAudioDevice(device: AudioDeviceInfo?) {
+            preferredDeviceId = device?.id
             activePlayer?.setPreferredAudioDevice(device)
         }
     }

@@ -153,7 +153,7 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
                 if (connected != null && connected.isPlaying) {
                     _state.update { it.copy(position = connected.currentPosition.coerceAtLeast(0L)) }
                 }
-                delay(250)
+                delay(400)
             }
         }
     }

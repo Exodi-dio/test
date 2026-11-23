@@ -52,8 +52,9 @@ fun TrackArtwork(
     ) {
         val image = bitmap
         if (image != null) {
+            val imageBitmap = remember(image) { image.asImageBitmap() }
             Image(
-                bitmap = image.asImageBitmap(),
+                bitmap = imageBitmap,
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier.fillMaxSize(),

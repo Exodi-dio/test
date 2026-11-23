@@ -35,7 +35,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.exodi.nowplaying.Track
 
-private val SheetColor = Color(0xF0211E1E)
+val SheetColor = Color(0xF0211E1E)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

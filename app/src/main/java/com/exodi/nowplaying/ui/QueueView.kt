@@ -126,7 +126,6 @@ private fun QueueRow(
     onMenu: (IntRect) -> Unit,
 ) {
     var bounds by remember { mutableStateOf(IntRect.Zero) }
-
     Row(
         Modifier
             .fillMaxWidth()
@@ -166,7 +165,10 @@ private fun QueueRow(
         Box(
             Modifier
                 .size(24.dp)
-                .onGloballyPositioned { bounds = it.boundsInWindow() }
+                .onGloballyPositioned {
+                    val rect = it.boundsInWindow()
+                    bounds = IntRect(rect.left.toInt(), rect.top.toInt(), rect.right.toInt(), rect.bottom.toInt())
+                }
                 .clickable { onMenu(bounds) },
             contentAlignment = Alignment.Center,
         ) {

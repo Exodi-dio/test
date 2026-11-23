@@ -1,6 +1,7 @@
 package com.exodi.nowplaying
 
 import android.content.Intent
+import android.media.AudioDeviceInfo
 import androidx.media3.common.AudioAttributes
 import androidx.media3.common.C
 import androidx.media3.exoplayer.ExoPlayer
@@ -24,6 +25,7 @@ class PlaybackService : MediaSessionService() {
             .setHandleAudioBecomingNoisy(true)
             .build()
         session = MediaSession.Builder(this, player).build()
+        activePlayer = player
     }
 
     override fun onGetSession(controllerInfo: MediaSession.ControllerInfo): MediaSession? = session
@@ -41,6 +43,20 @@ class PlaybackService : MediaSessionService() {
             release()
         }
         session = null
+        activePlayer = null
         super.onDestroy()
+    }
+
+    companion object {
+        @Volatile
+        private var activePlayer: ExoPlayer? = null
+
+        /**
+         * Sends the playback to a different output, such as a pair of
+         * headphones or a Bluetooth speaker.
+         */
+        fun setPreferredAudioDevice(device: AudioDeviceInfo?) {
+            activePlayer?.setPreferredAudioDevice(device)
+        }
     }
 }

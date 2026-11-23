@@ -32,6 +32,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import com.exodi.nowplaying.PlaybackService
 
 /**
  * Lists the output devices the system knows about and routes the playback to
@@ -49,7 +50,7 @@ fun OutputDeviceSheet(onDismiss: () -> Unit) {
             .distinctBy { it.id }
             .sortedBy { it.type }
     }
-    val active = remember { audioManager.getPreferredDevice() }
+    val active = remember { audioManager.activePlaybackConfigurations.firstOrNull()?.audioDevice }
 
     val sheetState = rememberModalBottomSheetState()
     ModalBottomSheet(onDismissRequest = onDismiss, sheetState = sheetState, containerColor = SheetColor) {
@@ -66,7 +67,7 @@ fun OutputDeviceSheet(onDismiss: () -> Unit) {
                     Modifier
                         .fillMaxWidth()
                         .clickable {
-                            audioManager.setPreferredDevice(device)
+                            PlaybackService.setPreferredAudioDevice(device)
                             onDismiss()
                         }
                         .padding(horizontal = 28.dp, vertical = 12.dp),

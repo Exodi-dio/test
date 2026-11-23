@@ -6,6 +6,7 @@ import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.graphics.vector.PathBuilder
 import androidx.compose.ui.graphics.vector.path
 import androidx.compose.ui.unit.dp
 import kotlin.math.PI
@@ -78,9 +79,9 @@ val ListIcon: ImageVector by lazy {
         viewportHeight = 24f,
     ).apply {
         path(fill = SolidColor(Color.White)) {
-            addCircle(Offset(4.6f, 6f), 1.7f)
-            addCircle(Offset(4.6f, 12f), 1.7f)
-            addCircle(Offset(4.6f, 18f), 1.7f)
+            circle(4.6f, 6f, 1.7f)
+            circle(4.6f, 12f, 1.7f)
+            circle(4.6f, 18f, 1.7f)
         }
         path(
             stroke = SolidColor(Color.White),
@@ -126,15 +127,14 @@ val BroadcastIcon: ImageVector by lazy {
                     val to = pointOn(centerX, centerY, radius, next)
                     val startTan = tangentOn(angle)
                     val endTan = tangentOn(next)
-                    cubicTo(
+                    curveTo(
                         from.first + handle * radius * startTan.first,
                         from.second + handle * radius * startTan.second,
                         to.first - handle * radius * endTan.first,
                         to.second - handle * radius * endTan.second,
                         to.first,
                         to.second,
-                    )
-                    angle = next
+                    )                    angle = next
                 }
             }
         }
@@ -147,12 +147,21 @@ val BroadcastIcon: ImageVector by lazy {
     }.build()
 }
 
-private fun pointOn(centerX: Float, centerY: Float, radius: Float, degrees: Double): Pair<Float, Float> {
-    val radians = degrees * PI / 180.0
+private fun pointOn(centerX: Float, centerY: Float, radius: Float, degrees: Double): Pair<Float, Float> {    val radians = degrees * PI / 180.0
     return (centerX + radius * cos(radians)).toFloat() to (centerY + radius * sin(radians)).toFloat()
 }
 
 private fun tangentOn(degrees: Double): Pair<Float, Float> {
     val radians = degrees * PI / 180.0
     return (-sin(radians)).toFloat() to cos(radians).toFloat()
+}
+
+private fun PathBuilder.circle(centerX: Float, centerY: Float, radius: Float) {
+    val k = 0.5523f * radius
+    moveTo(centerX + radius, centerY)
+    curveTo(centerX + radius, centerY + k, centerX + k, centerY + radius, centerX, centerY + radius)
+    curveTo(centerX - k, centerY + radius, centerX - radius, centerY + k, centerX - radius, centerY)
+    curveTo(centerX - radius, centerY - k, centerX - k, centerY - radius, centerX, centerY - radius)
+    curveTo(centerX + k, centerY - radius, centerX + radius, centerY - k, centerX + radius, centerY)
+    close()
 }

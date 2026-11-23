@@ -12,6 +12,7 @@ data class Track(
     val title: String,
     val artist: String,
     val album: String,
+    val albumId: Long,
     val duration: Long,
     val path: String?,
 )
@@ -23,6 +24,7 @@ object Library {
         MediaStore.Audio.Media.TITLE,
         MediaStore.Audio.Media.ARTIST,
         MediaStore.Audio.Media.ALBUM,
+        MediaStore.Audio.Media.ALBUM_ID,
         MediaStore.Audio.Media.DURATION,
         MediaStore.Audio.Media.DATA,
     )
@@ -46,6 +48,7 @@ object Library {
             val titleColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.TITLE)
             val artistColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.ARTIST)
             val albumColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM)
+            val albumIdColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM_ID)
             val durationColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DURATION)
             val dataColumn = cursor.getColumnIndex(MediaStore.Audio.Media.DATA)
 
@@ -57,6 +60,7 @@ object Library {
                     title = cursor.getString(titleColumn).clean() ?: "Unknown",
                     artist = cursor.getString(artistColumn).clean() ?: "Unknown artist",
                     album = cursor.getString(albumColumn).orEmpty(),
+                    albumId = cursor.getLong(albumIdColumn),
                     duration = cursor.getLong(durationColumn),
                     path = if (dataColumn >= 0) cursor.getString(dataColumn) else null,
                 )
@@ -64,6 +68,9 @@ object Library {
         }
         return tracks
     }
+
+    fun albumTracks(context: Context, albumId: Long): List<Track> =
+        scan(context).filter { it.albumId == albumId }
 
     private fun String?.clean(): String? =
         this?.takeIf { it.isNotBlank() && it != "<unknown>" }

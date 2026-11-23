@@ -41,10 +41,13 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
     private val _state = MutableStateFlow(PlayerUiState())
     val state: StateFlow<PlayerUiState> = _state.asStateFlow()
 
+    val favourites = Favourites(application)
+
     private var controller: MediaController? = null
     private var connection: ListenableFuture<MediaController>? = null
     private var ticker: Job? = null
     private var loadPending = false
+    private var sleepJob: Job? = null
 
     private val listener = object : Player.Listener {
         override fun onEvents(player: Player, events: Player.Events) = sync()
@@ -84,19 +87,7 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
             _state.update { it.copy(tracks = tracks, scanning = false) }
             if (tracks.isEmpty()) return@launch
 
-            val items = tracks.map { track ->
-                MediaItem.Builder()
-                    .setMediaId(track.id.toString())
-                    .setUri(track.uri)
-                    .setMediaMetadata(
-                        MediaMetadata.Builder()
-                            .setTitle(track.title)
-                            .setArtist(track.artist)
-                            .setAlbumTitle(track.album)
-                            .build()
-                    )
-                    .build()
-            }
+            val items = tracks.map { track -> track.toMediaItem() }
             connected.setMediaItems(items)
             connected.prepare()
             connected.play()
@@ -107,6 +98,21 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
         val connected = controller ?: return
         connected.seekToDefaultPosition(index)
         connected.play()
+    }
+
+    fun play(track: Track) {
+        val index = state.tracks.indexOfFirst { it.id == track.id }
+        if (index >= 0) playAt(index)
+    }
+
+    fun playNext(track: Track) {
+        val connected = controller ?: return
+        val current = connected.currentMediaItemIndex
+        connected.addMediaItem((current + 1).coerceAtLeast(0), track.toMediaItem())
+        if (current < 0) {
+            connected.prepare()
+            connected.play()
+        }
     }
 
     fun togglePlay() {
@@ -145,6 +151,25 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
         }
     }
 
+    fun startSleepTimer(minutes: Int) {
+        sleepJob?.cancel()
+        if (minutes <= 0) return
+        sleepJob = viewModelScope.launch {
+            delay(minutes * 60_000L)
+            controller?.pause()
+        }
+    }
+
+    fun codecOf(track: Track?): String? = when (track?.path?.substringAfterLast('.', "")?.lowercase()) {
+        "flac" -> "FLAC"
+        "m4a", "aac", "mp4" -> "AAC"
+        "mp3" -> "MP3"
+        "ogg", "oga" -> "Vorbis"
+        "opus" -> "Opus"
+        "wav" -> "WAV"
+        else -> null
+    }
+
     private fun startTicker() {
         ticker?.cancel()
         ticker = viewModelScope.launch {
@@ -175,6 +200,7 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
 
     override fun onCleared() {
         ticker?.cancel()
+        sleepJob?.cancel()
         controller?.removeListener(listener)
         connection?.let { MediaController.releaseFuture(it) }
         connection = null
@@ -182,3 +208,15 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
         super.onCleared()
     }
 }
+
+private fun Track.toMediaItem(): MediaItem = MediaItem.Builder()
+    .setMediaId(id.toString())
+    .setUri(uri)
+    .setMediaMetadata(
+        MediaMetadata.Builder()
+            .setTitle(title)
+            .setArtist(artist)
+            .setAlbumTitle(album)
+            .build()
+    )
+    .build()

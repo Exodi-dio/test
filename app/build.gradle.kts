@@ -10,7 +10,7 @@ android {
 
     defaultConfig {
         applicationId = "com.exodi.nowplaying"
-        minSdk = 26
+        minSdk = 31
         targetSdk = 35
         versionCode = 1
         versionName = "1.0.0"
@@ -75,4 +75,5 @@ dependencies {
     implementation("androidx.media3:media3-common:1.4.1")
     implementation("androidx.media3:media3-exoplayer:1.4.1")
     implementation("androidx.media3:media3-session:1.4.1")
+    implementation("androidx.mediarouter:mediarouter:1.7.0")
 }

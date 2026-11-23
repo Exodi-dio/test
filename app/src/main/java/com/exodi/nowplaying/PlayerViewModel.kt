@@ -115,6 +115,23 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
         }
     }
 
+    fun addToQueue(track: Track) {
+        val connected = controller ?: return
+        connected.addMediaItem(track.toMediaItem())
+    }
+
+    fun removeFromQueue(track: Track) {
+        val connected = controller ?: return
+        val index = connected.mediaItems.indexOfFirst { it.mediaId == track.id.toString() }
+        if (index >= 0) connected.removeMediaItem(index)
+    }
+
+    fun pinToTop(track: Track) {
+        val connected = controller ?: return
+        val index = connected.mediaItems.indexOfFirst { it.mediaId == track.id.toString() }
+        if (index > 0) connected.moveMediaItem(index, 0)
+    }
+
     fun togglePlay() {
         val connected = controller ?: return
         if (connected.isPlaying) connected.pause() else connected.play()

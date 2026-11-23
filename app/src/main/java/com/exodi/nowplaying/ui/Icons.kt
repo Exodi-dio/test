@@ -1,6 +1,9 @@
 package com.exodi.nowplaying.ui
 
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Rect
+import androidx.compose.ui.graphics.Size
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.StrokeJoin
@@ -21,7 +24,7 @@ val QuoteBubble: ImageVector by lazy {
     ).apply {
         path(
             stroke = SolidColor(Color.White),
-            strokeLineWidth = 1.7f,
+            strokeLineWidth = 1.8f,
             strokeLineCap = StrokeCap.Round,
             strokeLineJoin = StrokeJoin.Round,
         ) {
@@ -57,6 +60,91 @@ val QuoteBubble: ImageVector by lazy {
             lineTo(14.9f, 12.9f)
             curveTo(15.6f, 12.9f, 16f, 12.5f, 16f, 11.7f)
             lineTo(13f, 11.7f)
+            close()
+        }
+    }.build()
+}
+
+/**
+ * The queue button: three dots and three rules.
+ */
+val ListIcon: ImageVector by lazy {
+    ImageVector.Builder(
+        name = "ListIcon",
+        defaultWidth = 24.dp,
+        defaultHeight = 24.dp,
+        viewportWidth = 24f,
+        viewportHeight = 24f,
+    ).apply {
+        path(fill = SolidColor(Color.White)) {
+            moveTo(4.6f, 4.8f)
+            arcTo(Rect(Offset(2.9f, 3.1f), Size(3.4f, 3.4f)), 0f, 360f, false)
+            close()
+        }
+        path(fill = SolidColor(Color.White)) {
+            moveTo(4.6f, 12f)
+            arcTo(Rect(Offset(2.9f, 10.3f), Size(3.4f, 3.4f)), 0f, 360f, false)
+            close()
+        }
+        path(fill = SolidColor(Color.White)) {
+            moveTo(4.6f, 19.2f)
+            arcTo(Rect(Offset(2.9f, 17.5f), Size(3.4f, 3.4f)), 0f, 360f, false)
+            close()
+        }
+        path(fill = SolidColor(Color.White)) {
+            roundRect(
+                left = 9.6f,
+                top = 3.7f,
+                right = 21f,
+                bottom = 6.1f,
+                cornerRadius = androidx.compose.ui.geometry.CornerRadius(1.2f, 1.2f),
+            )
+        }
+        path(fill = SolidColor(Color.White)) {
+            roundRect(
+                left = 9.6f,
+                top = 10.9f,
+                right = 21f,
+                bottom = 13.3f,
+                cornerRadius = androidx.compose.ui.geometry.CornerRadius(1.2f, 1.2f),
+            )
+        }
+        path(fill = SolidColor(Color.White)) {
+            roundRect(
+                left = 9.6f,
+                top = 18.1f,
+                right = 21f,
+                bottom = 20.5f,
+                cornerRadius = androidx.compose.ui.geometry.CornerRadius(1.2f, 1.2f),
+            )
+        }
+    }.build()
+}
+
+/**
+ * Output device: a marker under three broadcast arcs.
+ */
+val BroadcastIcon: ImageVector by lazy {
+    ImageVector.Builder(
+        name = "BroadcastIcon",
+        defaultWidth = 24.dp,
+        defaultHeight = 24.dp,
+        viewportWidth = 24f,
+        viewportHeight = 24f,
+    ).apply {
+        path(
+            stroke = SolidColor(Color.White),
+            strokeLineWidth = 1.7f,
+            strokeLineCap = StrokeCap.Round,
+        ) {
+            arcTo(Rect(Offset(8.2f, 8.2f), Size(7.6f, 7.6f)), 200f, 140f, false)
+            arcTo(Rect(Offset(5f, 5f), Size(14f, 14f)), 200f, 140f, false)
+            arcTo(Rect(Offset(1.8f, 1.8f), Size(20.4f, 20.4f)), 200f, 140f, false)
+        }
+        path(fill = SolidColor(Color.White)) {
+            moveTo(12f, 22.2f)
+            lineTo(6.6f, 14.4f)
+            lineTo(17.4f, 14.4f)
             close()
         }
     }.build()

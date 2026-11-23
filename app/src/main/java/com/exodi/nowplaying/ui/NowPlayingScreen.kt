@@ -1,6 +1,7 @@
 package com.exodi.nowplaying.ui
 
 import android.graphics.Bitmap
+import android.widget.Toast
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -22,26 +23,26 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.IntRect
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.mediarouter.media.MediaRouteDialogFactory
 import com.exodi.nowplaying.Artwork
-import com.exodi.nowplaying.ArtworkBlur
 import com.exodi.nowplaying.ArtTint
 import com.exodi.nowplaying.Library
 import com.exodi.nowplaying.Lyrics
 import com.exodi.nowplaying.LyricsLoader
 import com.exodi.nowplaying.PlayerViewModel
 import com.exodi.nowplaying.Track
+import com.exodi.nowplaying.Transfer
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 @Composable
@@ -53,30 +54,21 @@ fun NowPlayingScreen(
     val state by player.state.collectAsStateWithLifecycle()
     val favourites by player.favourites.ids.collectAsStateWithLifecycle()
     val context = LocalContext.current
-    val density = LocalDensity.current
-    val configuration = LocalConfiguration.current
+    val scope = rememberCoroutineScope()
 
     var mode by remember { mutableStateOf(PlayerMode.Big) }
     var showMore by remember { mutableStateOf(false) }
     var menuTrack by remember { mutableStateOf<Track?>(null) }
+    var menuAnchor by remember { mutableStateOf(IntRect.Zero) }
     var showAlbum by remember { mutableStateOf(false) }
     var showSleep by remember { mutableStateOf(false) }
+    var showOutputs by remember { mutableStateOf(false) }
+    var infoTrack by remember { mutableStateOf<Track?>(null) }
 
     val track = state.track
 
     val artwork by produceState<Bitmap?>(null, track?.id) {
         value = track?.let { withContext(Dispatchers.IO) { Artwork.load(context, it) } }
-    }
-
-    val artWidthPx = with(density) { (configuration.screenWidthDp * 1.6f).roundToPx() }
-    val artHeightPx = (artWidthPx * (600f / 642f)).toInt()
-    val radiusPx = with(density) { 86.4.dp.toPx() }
-    val blurred by produceState<Bitmap?>(null, track?.id, artWidthPx) {
-        value = track?.let {
-            withContext(Dispatchers.IO) {
-                ArtworkBlur.blurred(context, it, radiusPx, artWidthPx, artHeightPx)
-            }
-        }
     }
     val wash = remember(artwork) { ArtTint.of(artwork) }
 
@@ -98,8 +90,19 @@ fun NowPlayingScreen(
         if (upcoming.isEmpty()) state.tracks else upcoming
     }
 
+    val downloadTrack: (Track) -> Unit = { target ->
+        scope.launch {
+            val saved = Transfer.saveCopy(context, target)
+            Toast.makeText(
+                context,
+                if (saved) "Saved to Downloads" else "Could not save the copy",
+                Toast.LENGTH_SHORT,
+            ).show()
+        }
+    }
+
     Box(Modifier.fillMaxSize().background(Color(0xFF101014))) {
-        ArtworkBackdrop(artwork = artwork, blurred = blurred, wash = wash)
+        ArtworkBackdrop(artwork = artwork, wash = wash)
 
         Column(
             Modifier
@@ -141,12 +144,18 @@ fun NowPlayingScreen(
                                 albumArtwork = track,
                                 queue = queue,
                                 currentId = track?.id,
+                                favourites = favourites,
                                 onPlay = {
                                     player.play(it)
                                     mode = PlayerMode.Big
                                 },
                                 onAlbum = { showAlbum = true },
-                                onRowMenu = { menuTrack = it },
+                                onFavourite = { player.favourites.toggle(it.id) },
+                                onDownload = downloadTrack,
+                                onRowMenu = { target, bounds ->
+                                    menuTrack = target
+                                    menuAnchor = bounds
+                                },
                             )
                         }
                     }
@@ -169,15 +178,64 @@ fun NowPlayingScreen(
                     onPrevious = player::previous,
                     onNext = player::next,
                     onShuffle = player::toggleShuffle,
-                    onAirPlay = {
-                        runCatching {
-                            MediaRouteDialogFactory(context).onCreateChooserDialog().show()
-                        }
-                    },
+                    onAirPlay = { showOutputs = true },
                     onSeek = player::seekTo,
                 )
             }
         }
+    }
+
+    menuTrack?.let { target ->
+        SongMenu(
+            track = target,
+            anchor = menuAnchor,
+            artwork = artwork,
+            favourite = target.id in favourites,
+            onFavourite = {
+                player.favourites.toggle(target.id)
+                menuTrack = null
+            },
+            onDownload = {
+                menuTrack = null
+                downloadTrack(target)
+            },
+            onAlbum = {
+                menuTrack = null
+                showAlbum = true
+            },
+            onMore = {
+                menuTrack = null
+                showMore = true
+            },
+            onPlayNext = {
+                player.playNext(target)
+                menuTrack = null
+            },
+            onAddToQueue = {
+                player.addToQueue(target)
+                menuTrack = null
+            },
+            onSongInfo = {
+                menuTrack = null
+                infoTrack = target
+            },
+            onPinToTop = {
+                player.pinToTop(target)
+                menuTrack = null
+            },
+            onRemove = {
+                player.removeFromQueue(target)
+                menuTrack = null
+            },
+            onOpenFiles = {
+                menuTrack = null
+                Transfer.openInFiles(context, target)
+            },
+            onShare = {
+                menuTrack = null
+                Transfer.share(context, target)
+            },
+        )
     }
 
     if (showMore) {
@@ -206,26 +264,6 @@ fun NowPlayingScreen(
         )
     }
 
-    menuTrack?.let { target ->
-        TrackMenuSheet(
-            track = target,
-            favourite = target.id in favourites,
-            onPlayNext = {
-                player.playNext(target)
-                menuTrack = null
-            },
-            onFavourite = {
-                player.favourites.toggle(target.id)
-                menuTrack = null
-            },
-            onAlbum = {
-                menuTrack = null
-                showAlbum = true
-            },
-            onDismiss = { menuTrack = null },
-        )
-    }
-
     if (showSleep) {
         SleepTimerSheet(
             onSelect = { minutes ->
@@ -247,6 +285,18 @@ fun NowPlayingScreen(
                 mode = PlayerMode.Big
             },
             onDismiss = { showAlbum = false },
+        )
+    }
+
+    if (showOutputs) {
+        OutputDeviceSheet(onDismiss = { showOutputs = false })
+    }
+
+    infoTrack?.let { target ->
+        SongInfoSheet(
+            track = target,
+            codec = player.codecOf(target),
+            onDismiss = { infoTrack = null },
         )
     }
 }

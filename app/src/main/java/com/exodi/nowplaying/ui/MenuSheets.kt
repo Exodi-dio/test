@@ -183,6 +183,70 @@ fun AlbumSheet(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun SongInfoSheet(
+    track: Track,
+    codec: String?,
+    onDismiss: () -> Unit,
+) {
+    val sheetState = rememberModalBottomSheetState()
+    ModalBottomSheet(onDismissRequest = onDismiss, sheetState = sheetState, containerColor = SheetColor) {
+        Column(Modifier.fillMaxWidth().padding(bottom = 28.dp)) {
+            Text(
+                text = track.title,
+                style = Type.PlaylistName,
+                color = Color.White,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.padding(horizontal = 28.dp, vertical = 8.dp),
+            )
+            Text(
+                text = track.artist,
+                style = Type.MiniTitle,
+                color = Palette.TextSecondary,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.padding(horizontal = 28.dp),
+            )
+            Spacer(Modifier.height(16.dp))
+            InfoRow("Album", track.album.ifBlank { "—" })
+            InfoRow("Codec", codec ?: "—")
+            InfoRow("Length", formatLength(track.duration))
+            InfoRow("File", track.path?.substringAfterLast('/') ?: "—")
+        }
+    }
+}
+
+@Composable
+private fun InfoRow(label: String, value: String) {
+    Row(
+        Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 28.dp, vertical = 6.dp),
+        verticalAlignment = Alignment.Top,
+    ) {
+        Text(
+            text = label,
+            style = Type.MiniTitle,
+            color = Palette.TextSecondary,
+            modifier = Modifier.width(72.dp),
+        )
+        Text(
+            text = value,
+            style = Type.MiniTitle,
+            color = Palette.TextPrimary,
+            modifier = Modifier.weight(1f),
+        )
+    }
+}
+
+private fun formatLength(millis: Long): String {
+    if (millis <= 0L) return "—"
+    val totalSeconds = millis / 1000
+    return "${totalSeconds / 60}:${(totalSeconds % 60).toString().padStart(2, '0')}"
+}
+
 @Composable
 private fun SheetItem(
     icon: ImageVector,

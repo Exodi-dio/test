@@ -72,6 +72,27 @@ object Type {
         lineHeight = 17.sp,
         letterSpacing = 0.sp,
     )
+    val SourceLabel = TextStyle(
+        fontFamily = InterFamily,
+        fontWeight = FontWeight.Medium,
+        fontSize = 14.sp,
+        lineHeight = 17.sp,
+        letterSpacing = (-0.28).sp,
+    )
+    val MenuTitle = TextStyle(
+        fontFamily = InterFamily,
+        fontWeight = FontWeight.Medium,
+        fontSize = 12.8.sp,
+        lineHeight = 15.sp,
+        letterSpacing = 0.sp,
+    )
+    val MenuSubtitle = TextStyle(
+        fontFamily = InterFamily,
+        fontWeight = FontWeight.Medium,
+        fontSize = 10.4.sp,
+        lineHeight = 12.sp,
+        letterSpacing = 0.sp,
+    )
     val PlaylistName = TextStyle(
         fontFamily = InterFamily,
         fontWeight = FontWeight.SemiBold,

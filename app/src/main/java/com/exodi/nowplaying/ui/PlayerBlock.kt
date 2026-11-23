@@ -8,23 +8,21 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Cast
-import androidx.compose.material.icons.rounded.GraphicEq
+import androidx.compose.material.icons.rounded.FastForward
+import androidx.compose.material.icons.rounded.FastRewind
 import androidx.compose.material.icons.rounded.MoreHoriz
 import androidx.compose.material.icons.rounded.MusicNote
 import androidx.compose.material.icons.rounded.Pause
 import androidx.compose.material.icons.rounded.PlayArrow
 import androidx.compose.material.icons.rounded.Shuffle
-import androidx.compose.material.icons.rounded.SkipNext
-import androidx.compose.material.icons.rounded.SkipPrevious
 import androidx.compose.material.icons.rounded.Star
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -36,13 +34,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.CornerRadius
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.exodi.nowplaying.PlayerUiState
@@ -71,31 +67,32 @@ fun PlayerBlock(
 ) {
     Column(Modifier.fillMaxWidth()) {
         if (mode == PlayerMode.Big) {
-            Spacer(Modifier.height(28.dp))
+            Spacer(Modifier.height(29.dp))
             Text(
                 text = track?.title.orEmpty(),
                 style = Type.Title,
                 color = Palette.TextPrimary,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
+                textAlign = TextAlign.Center,
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 28.dp),
             )
-            Spacer(Modifier.height(6.dp))
+            Spacer(Modifier.height(3.dp))
             Text(
                 text = track?.artist.orEmpty(),
                 style = Type.Artist,
                 color = Palette.TextSecondary,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
+                textAlign = TextAlign.Center,
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 28.dp),
             )
-            Spacer(Modifier.height(28.dp))
+            Spacer(Modifier.height(38.dp))
         } else {
-            Spacer(Modifier.height(24.dp))
+            Spacer(Modifier.height(28.dp))
         }
 
         ControlRow(
-            state = state,
             track = track,
             mode = mode,
             favourite = favourite,
@@ -108,7 +105,7 @@ fun PlayerBlock(
 
         Spacer(Modifier.height(40.dp))
         ProgressBlock(state = state, codec = codec, onSeek = onSeek)
-        Spacer(Modifier.height(14.dp))
+        Spacer(Modifier.height(32.dp))
         TransportRow(
             state = state,
             onTogglePlay = onTogglePlay,
@@ -123,7 +120,6 @@ fun PlayerBlock(
 
 @Composable
 private fun ControlRow(
-    state: PlayerUiState,
     track: Track?,
     mode: PlayerMode,
     favourite: Boolean,
@@ -136,12 +132,11 @@ private fun ControlRow(
     Row(
         Modifier.fillMaxWidth().padding(horizontal = 28.dp),
         verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween,
     ) {
         GlassButton(onClick = onLyrics, modifier = Modifier.size(50.dp), pressed = mode == PlayerMode.Lyrics) {
-            Icon(QuoteBubble, contentDescription = "Lyrics", tint = Color.White, modifier = Modifier.size(22.dp))
+            Icon(QuoteBubble, contentDescription = "Lyrics", tint = Color.White, modifier = Modifier.size(23.dp))
         }
-
-        Spacer(Modifier.weight(1f))
 
         if (mode == PlayerMode.Big) {
             GlassButton(
@@ -154,21 +149,21 @@ private fun ControlRow(
                         imageVector = Icons.Rounded.Star,
                         contentDescription = "Favourite",
                         tint = if (favourite) Color.White else Color.White.copy(alpha = 0.55f),
-                        modifier = Modifier.size(20.dp).noRippleClick(onFavourite),
+                        modifier = Modifier.size(22.dp).noRippleClick(onFavourite),
                     )
                     Spacer(Modifier.width(18.dp))
                     Icon(
                         imageVector = Icons.Rounded.MusicNote,
                         contentDescription = "Album",
-                        tint = Color.White.copy(alpha = 0.55f),
-                        modifier = Modifier.size(20.dp).noRippleClick(onAlbum),
+                        tint = Color.White.copy(alpha = 0.75f),
+                        modifier = Modifier.size(22.dp).noRippleClick(onAlbum),
                     )
                     Spacer(Modifier.width(18.dp))
                     Icon(
                         imageVector = Icons.Rounded.MoreHoriz,
                         contentDescription = "More",
-                        tint = Color.White.copy(alpha = 0.55f),
-                        modifier = Modifier.size(20.dp),
+                        tint = Color.White.copy(alpha = 0.75f),
+                        modifier = Modifier.size(22.dp),
                     )
                 }
             }
@@ -202,14 +197,12 @@ private fun ControlRow(
             }
         }
 
-        Spacer(Modifier.weight(1f))
-
         GlassButton(onClick = onQueue, modifier = Modifier.size(50.dp), pressed = mode == PlayerMode.Queue) {
             Icon(
-                imageVector = Icons.Rounded.GraphicEq,
+                imageVector = ListIcon,
                 contentDescription = "Queue",
                 tint = Color.White,
-                modifier = Modifier.size(20.dp),
+                modifier = Modifier.size(22.dp),
             )
         }
     }
@@ -224,9 +217,8 @@ private fun ProgressBlock(state: PlayerUiState, codec: String?, onSeek: (Long) -
     } else {
         0f
     }
-    val density = LocalDensity.current
 
-    Column(Modifier.fillMaxWidth().padding(horizontal = 28.dp)) {
+    Column(Modifier.fillMaxWidth().padding(horizontal = 31.dp)) {
         Box(
             Modifier
                 .fillMaxWidth()
@@ -301,17 +293,17 @@ private fun TransportRow(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {
-        IconButton2(Icons.Rounded.Cast, "AirPlay", onAirPlay)
-        IconButton2(Icons.Rounded.SkipPrevious, "Previous", onPrevious, size = 32.dp)
+        IconButton2(BroadcastIcon, "Output device", onAirPlay, size = 22.dp)
+        IconButton2(Icons.Rounded.FastRewind, "Previous", onPrevious, size = 24.dp)
         IconButton2(
             imageVector = if (state.playing) Icons.Rounded.Pause else Icons.Rounded.PlayArrow,
             contentDescription = if (state.playing) "Pause" else "Play",
             onClick = onTogglePlay,
-            size = if (state.playing) 32.dp else 36.dp,
-            tint = Color.White,
+            size = if (state.playing) 30.dp else 32.dp,
+            tint = Color.White.copy(alpha = 0.5f),
         )
-        IconButton2(Icons.Rounded.SkipNext, "Next", onNext, size = 32.dp)
-        IconButton2(Icons.Rounded.Shuffle, "Shuffle", onShuffle)
+        IconButton2(Icons.Rounded.FastForward, "Next", onNext, size = 24.dp)
+        IconButton2(Icons.Rounded.Shuffle, "Shuffle", onShuffle, size = 30.dp)
     }
 }
 
@@ -329,7 +321,12 @@ private fun IconButton2(
             .noRippleClick(onClick),
         contentAlignment = Alignment.Center,
     ) {
-        Icon(imageVector, contentDescription = contentDescription, tint = tint, modifier = Modifier.fillMaxSize())
+        Icon(
+            imageVector = imageVector,
+            contentDescription = contentDescription,
+            tint = tint,
+            modifier = Modifier.fillMaxSize(),
+        )
     }
 }
 
@@ -337,7 +334,7 @@ private fun IconButton2(
 private fun Modifier.noRippleClick(onClick: () -> Unit): Modifier = this
     .then(
         Modifier.pointerInput(onClick) {
-            androidx.compose.foundation.gestures.detectTapGestures { onClick() }
+            detectTapGestures { onClick() }
         }
     )
 

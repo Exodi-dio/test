@@ -124,7 +124,7 @@ fun SleepTimerSheet(
                 modifier = Modifier.padding(horizontal = 28.dp, vertical = 8.dp),
             )
             listOf(15, 30, 45, 60).forEach { minutes ->
-                SheetItem(Icons.Rounded.Timer, "$minutes minutes") { onSelect(minutes) }
+                SheetItem(Icons.Rounded.Timer, "$minutes minutes", onClick = { onSelect(minutes) })
             }
         }
     }

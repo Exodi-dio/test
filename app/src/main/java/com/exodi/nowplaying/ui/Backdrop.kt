@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithContent
@@ -16,6 +17,7 @@ import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.CompositingStrategy
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
@@ -64,7 +66,7 @@ fun ArtworkBackdrop(
         ) {
             if (artwork != null) {
                 Image(
-                    bitmap = artwork,
+                    bitmap = artwork.asImageBitmap(),
                     contentDescription = null,
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
@@ -85,7 +87,7 @@ fun ArtworkBackdrop(
 
             if (blurred != null) {
                 Image(
-                    bitmap = blurred,
+                    bitmap = blurred.asImageBitmap(),
                     contentDescription = null,
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
@@ -110,7 +112,7 @@ fun ArtworkBackdrop(
                     .background(
                         Brush.verticalGradient(
                             colors = listOf(Color.Transparent, Palette.ArtFade),
-                            startY = artHeight * 0.55f,
+                            startY = (artHeight * 0.55f).toPx(),
                             endY = artHeight.toPx(),
                         )
                     )

@@ -2,6 +2,7 @@ package com.exodi.nowplaying.ui
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.gestures.detectDragGestures
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15,7 +16,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.AirPlay
+import androidx.compose.material.icons.rounded.Cast
 import androidx.compose.material.icons.rounded.GraphicEq
 import androidx.compose.material.icons.rounded.MoreHoriz
 import androidx.compose.material.icons.rounded.MusicNote
@@ -300,7 +301,7 @@ private fun TransportRow(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {
-        IconButton2(Icons.Rounded.AirPlay, "AirPlay", onAirPlay)
+        IconButton2(Icons.Rounded.Cast, "AirPlay", onAirPlay)
         IconButton2(Icons.Rounded.SkipPrevious, "Previous", onPrevious, size = 32.dp)
         IconButton2(
             imageVector = if (state.playing) Icons.Rounded.Pause else Icons.Rounded.PlayArrow,
@@ -328,7 +329,7 @@ private fun IconButton2(
             .noRippleClick(onClick),
         contentAlignment = Alignment.Center,
     ) {
-        Icon(imageVector, contentDescription = contentDescription, tint = tint, modifier = Modifier.fillMaxWidth())
+        Icon(imageVector, contentDescription = contentDescription, tint = tint, modifier = Modifier.fillMaxSize())
     }
 }
 

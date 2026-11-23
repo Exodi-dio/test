@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.Button
@@ -31,7 +32,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.mediarouter.app.MediaRouteDialogFactory
+import androidx.mediarouter.media.MediaRouteDialogFactory
 import com.exodi.nowplaying.Artwork
 import com.exodi.nowplaying.ArtworkBlur
 import com.exodi.nowplaying.ArtTint

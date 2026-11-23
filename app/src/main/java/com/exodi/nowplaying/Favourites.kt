@@ -9,7 +9,12 @@ class Favourites(context: Context) {
 
     private val prefs = context.getSharedPreferences("favourites", Context.MODE_PRIVATE)
 
-    private val _ids = MutableStateFlow(prefs.getStringSet(KEY, emptySet()).orEmpty())
+    private val _ids = MutableStateFlow(
+        prefs.getStringSet(KEY, emptySet())
+            .orEmpty()
+            .mapNotNull { it.toLongOrNull() }
+            .toSet()
+    )
     val ids: StateFlow<Set<Long>> = _ids.asStateFlow()
 
     fun contains(trackId: Long): Boolean = _ids.value.contains(trackId)
@@ -17,7 +22,7 @@ class Favourites(context: Context) {
     fun toggle(trackId: Long) {
         val next = _ids.value.toMutableSet()
         if (!next.add(trackId)) next.remove(trackId)
-        prefs.edit().putStringSet(KEY, next).apply()
+        prefs.edit().putStringSet(KEY, next.map { it.toString() }.toSet()).apply()
         _ids.value = next
     }
 

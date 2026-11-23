@@ -101,7 +101,7 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
     }
 
     fun play(track: Track) {
-        val index = state.tracks.indexOfFirst { it.id == track.id }
+        val index = state.value.tracks.indexOfFirst { it.id == track.id }
         if (index >= 0) playAt(index)
     }
 

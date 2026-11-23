@@ -122,14 +122,22 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
 
     fun removeFromQueue(track: Track) {
         val connected = controller ?: return
-        val index = connected.mediaItems.indexOfFirst { it.mediaId == track.id.toString() }
+        val index = indexOf(track)
         if (index >= 0) connected.removeMediaItem(index)
     }
 
     fun pinToTop(track: Track) {
         val connected = controller ?: return
-        val index = connected.mediaItems.indexOfFirst { it.mediaId == track.id.toString() }
+        val index = indexOf(track)
         if (index > 0) connected.moveMediaItem(index, 0)
+    }
+
+    private fun indexOf(track: Track): Int {
+        val connected = controller ?: return -1
+        for (index in 0 until connected.mediaItemCount) {
+            if (connected.getMediaItemAt(index).mediaId == track.id.toString()) return index
+        }
+        return -1
     }
 
     fun togglePlay() {

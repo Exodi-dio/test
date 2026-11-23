@@ -2,14 +2,15 @@ package com.exodi.nowplaying.ui
 
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Rect
-import androidx.compose.ui.graphics.Size
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.path
 import androidx.compose.ui.unit.dp
+import kotlin.math.PI
+import kotlin.math.cos
+import kotlin.math.sin
 
 /**
  * Speech bubble with quote marks, the shape used for the lyrics button.
@@ -77,46 +78,21 @@ val ListIcon: ImageVector by lazy {
         viewportHeight = 24f,
     ).apply {
         path(fill = SolidColor(Color.White)) {
-            moveTo(4.6f, 4.8f)
-            arcTo(Rect(Offset(2.9f, 3.1f), Size(3.4f, 3.4f)), 0f, 360f, false)
-            close()
+            addCircle(Offset(4.6f, 6f), 1.7f)
+            addCircle(Offset(4.6f, 12f), 1.7f)
+            addCircle(Offset(4.6f, 18f), 1.7f)
         }
-        path(fill = SolidColor(Color.White)) {
-            moveTo(4.6f, 12f)
-            arcTo(Rect(Offset(2.9f, 10.3f), Size(3.4f, 3.4f)), 0f, 360f, false)
-            close()
-        }
-        path(fill = SolidColor(Color.White)) {
-            moveTo(4.6f, 19.2f)
-            arcTo(Rect(Offset(2.9f, 17.5f), Size(3.4f, 3.4f)), 0f, 360f, false)
-            close()
-        }
-        path(fill = SolidColor(Color.White)) {
-            roundRect(
-                left = 9.6f,
-                top = 3.7f,
-                right = 21f,
-                bottom = 6.1f,
-                cornerRadius = androidx.compose.ui.geometry.CornerRadius(1.2f, 1.2f),
-            )
-        }
-        path(fill = SolidColor(Color.White)) {
-            roundRect(
-                left = 9.6f,
-                top = 10.9f,
-                right = 21f,
-                bottom = 13.3f,
-                cornerRadius = androidx.compose.ui.geometry.CornerRadius(1.2f, 1.2f),
-            )
-        }
-        path(fill = SolidColor(Color.White)) {
-            roundRect(
-                left = 9.6f,
-                top = 18.1f,
-                right = 21f,
-                bottom = 20.5f,
-                cornerRadius = androidx.compose.ui.geometry.CornerRadius(1.2f, 1.2f),
-            )
+        path(
+            stroke = SolidColor(Color.White),
+            strokeLineWidth = 2.4f,
+            strokeLineCap = StrokeCap.Round,
+        ) {
+            moveTo(10.2f, 6f)
+            lineTo(20.4f, 6f)
+            moveTo(10.2f, 12f)
+            lineTo(20.4f, 12f)
+            moveTo(10.2f, 18f)
+            lineTo(20.4f, 18f)
         }
     }.build()
 }
@@ -137,15 +113,46 @@ val BroadcastIcon: ImageVector by lazy {
             strokeLineWidth = 1.7f,
             strokeLineCap = StrokeCap.Round,
         ) {
-            arcTo(Rect(Offset(8.2f, 8.2f), Size(7.6f, 7.6f)), 200f, 140f, false)
-            arcTo(Rect(Offset(5f, 5f), Size(14f, 14f)), 200f, 140f, false)
-            arcTo(Rect(Offset(1.8f, 1.8f), Size(20.4f, 20.4f)), 200f, 140f, false)
+            val centerX = 12f
+            val centerY = 14.6f
+            val handle = 0.4204f
+            listOf(4.4f, 7.2f, 10f).forEach { radius ->
+                var angle = 200.0
+                val first = pointOn(centerX, centerY, radius, angle)
+                moveTo(first.first, first.second)
+                repeat(2) {
+                    val next = angle + 70.0
+                    val from = pointOn(centerX, centerY, radius, angle)
+                    val to = pointOn(centerX, centerY, radius, next)
+                    val startTan = tangentOn(angle)
+                    val endTan = tangentOn(next)
+                    cubicTo(
+                        from.first + handle * radius * startTan.first,
+                        from.second + handle * radius * startTan.second,
+                        to.first - handle * radius * endTan.first,
+                        to.second - handle * radius * endTan.second,
+                        to.first,
+                        to.second,
+                    )
+                    angle = next
+                }
+            }
         }
         path(fill = SolidColor(Color.White)) {
-            moveTo(12f, 22.2f)
-            lineTo(6.6f, 14.4f)
-            lineTo(17.4f, 14.4f)
+            moveTo(12f, 22.4f)
+            lineTo(6.6f, 14.6f)
+            lineTo(17.4f, 14.6f)
             close()
         }
     }.build()
+}
+
+private fun pointOn(centerX: Float, centerY: Float, radius: Float, degrees: Double): Pair<Float, Float> {
+    val radians = degrees * PI / 180.0
+    return (centerX + radius * cos(radians)).toFloat() to (centerY + radius * sin(radians)).toFloat()
+}
+
+private fun tangentOn(degrees: Double): Pair<Float, Float> {
+    val radians = degrees * PI / 180.0
+    return (-sin(radians)).toFloat() to cos(radians).toFloat()
 }

@@ -47,4 +47,11 @@ jobs:
         with:
           files: app/build/outputs/apk/release/app-release.apk
           body: |
-            Local audio player. One screen: artwork, transport, queue, lyrics.
+            Now Playing, rebuilt on the Figma design.
+
+            - Artwork backdrop with a real Compose blur that fades into a wash of the cover colours
+            - Lyrics view with word level karaoke and per line blur
+            - Queue view with the options card from the design, every option wired up
+            - Scans the device on launch and starts playing
+
+            Design: https://www.figma.com/design/KpKE1p45nLdf1ahrCzgXDh

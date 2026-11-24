@@ -9,6 +9,7 @@ Three mobile frames, all on a 402 × 874 grid, all sharing the same player block
 | player big | `3224:4136` | [big](figma-player-big.png) |
 | player lyrics | `3224:4305` | [lyrics](figma-player-lyrics.png) |
 | player queue | `3226:4431` | [queue](figma-player-queue.png) |
+| song menu | `3887:18875` | popup opened from the queue rows |
 
 ## Backdrop
 
@@ -122,3 +123,38 @@ SF Symbols shapes, re-cut as vectors for Android.
 | backward / play / forward | transport row |
 | shuffle | transport row, from `4839:37532` |
 | ellipsis | queue rows |
+
+## Song menu
+
+The card that opens from the overflow button in a queue row, node `3887:18875`.
+
+- Card 209 wide, radius 27.2, dark fill `#211E1E` at 75 %, drop shadow 5 at 25 %
+  black, hairline stroke white 10 % → 0 → 20 %.
+- Quick action row 40 tall: four icons of 16–17 in slots of 42.76.
+- Hairlines 0.8 tall with 4 of padding on each side.
+- Item rows 40 tall: icon slot 42.76, title 12.8 / 15.3 white at 80 %, subtitle
+  10.4 / 12.4 white at 50 %, chevron 9.6 wide on the right.
+- Groups in the file: three items, two items, two items.
+
+The app keeps the layout and maps the streaming actions onto local ones:
+
+| file | app |
+| --- | --- |
+| favourite | favourite, stored on the device |
+| download | save a copy to Downloads |
+| save | go to album |
+| ellipsis | more options |
+| pin song | play next |
+| create station | add to the queue |
+| view song info | song info |
+| suggest less | pin to the top |
+| don't show this again | remove from the queue |
+| show in iTunes store | show in files |
+| share | share the file |
+
+## Deviations
+
+- SF Pro cannot be redistributed. Inter ships instead, as a single variable font.
+- The Dolby Atmos lockup between the times is replaced by the codec of the file.
+- The Figma glyphs are SF Symbols, so the icons are redrawn as vectors.
+

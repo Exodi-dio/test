@@ -105,19 +105,24 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
         if (index >= 0) playAt(index)
     }
 
+    /**
+     * The playlist is the library, so the queue actions reorder it: the track
+     * is moved to the slot it should play in.
+     */
     fun playNext(track: Track) {
         val connected = controller ?: return
-        val current = connected.currentMediaItemIndex
-        connected.addMediaItem((current + 1).coerceAtLeast(0), track.toMediaItem())
-        if (current < 0) {
-            connected.prepare()
-            connected.play()
-        }
+        val index = indexOf(track)
+        if (index < 0) return
+        val target = (connected.currentMediaItemIndex + 1).coerceAtMost(connected.mediaItemCount - 1)
+        if (index != target) connected.moveMediaItem(index, target)
     }
 
     fun addToQueue(track: Track) {
         val connected = controller ?: return
-        connected.addMediaItem(track.toMediaItem())
+        val index = indexOf(track)
+        if (index < 0) return
+        val target = connected.mediaItemCount - 1
+        if (index != target) connected.moveMediaItem(index, target)
     }
 
     fun removeFromQueue(track: Track) {
